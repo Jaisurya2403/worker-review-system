@@ -320,7 +320,7 @@ async function deleteStore(id, storeName) {
 }
 
 function viewQR(qrSlug, storeName, qrCodePath) {
-  const baseUrl = `http://localhost:5000`;
+  const baseUrl = `https://worker-review-backend.onrender.com`;
   const reviewUrl = `${window.location.origin}/customer-review.html?store=${qrSlug}`;
   currentQRData = { storeName, reviewUrl, qrCodePath };
 
