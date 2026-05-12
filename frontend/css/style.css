@@ -1009,12 +1009,39 @@ tbody tr:hover { background: var(--gray-100); }
    Responsive Mobile Styles
    ============================================================ */
 @media (max-width: 768px) {
-  .sidebar {
-    display: none;
-  }
-
   .dashboard-layout {
     flex-direction: column;
+  }
+
+  .sidebar {
+    display: block;
+    width: 100%;
+    height: auto;
+    position: sticky;
+    top: 64px;
+    z-index: 90;
+    padding: 10px;
+    border-right: none;
+    border-bottom: 1px solid var(--gray-100);
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  .sidebar-nav li {
+    flex: 0 0 auto;
+  }
+
+  .sidebar-nav li a {
+    margin-bottom: 0;
+    padding: 10px 14px;
+    white-space: nowrap;
   }
 
   .main-content {
@@ -1025,8 +1052,6 @@ tbody tr:hover { background: var(--gray-100); }
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
-
-  .stat-value { font-size: 1.6rem; }
 
   .charts-grid {
     grid-template-columns: 1fr;
@@ -1049,24 +1074,15 @@ tbody tr:hover { background: var(--gray-100); }
     padding: 24px 18px;
   }
 
-  table { font-size: 0.82rem; }
-  thead th, tbody td { padding: 10px 12px; }
+  table {
+    font-size: 0.82rem;
+  }
 
-  /* Mobile navbar menu */
-  .mobile-menu-btn {
-    display: flex;
-    background: none;
-    border: none;
-    font-size: 1.4rem;
-    color: var(--gray-700);
-    cursor: pointer;
+  thead th,
+  tbody td {
+    padding: 10px 12px;
   }
 }
-
-@media (min-width: 769px) {
-  .mobile-menu-btn { display: none; }
-}
-
 /* ============================================================
    Index / Landing Page
    ============================================================ */
