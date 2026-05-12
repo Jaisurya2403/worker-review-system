@@ -2,7 +2,7 @@
 // customer.js - Customer review page logic
 // ============================================================
 
-const API = 'http://localhost:5001/api';
+const API = 'https://worker-review-backend.onrender.com/api';
 
 let selectedWorkerId = null;
 let selectedRating = 0;

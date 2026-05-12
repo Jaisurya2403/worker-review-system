@@ -2,7 +2,7 @@
 // store.js - Store owner dashboard logic
 // ============================================================
 
-const API = 'http://localhost:5001/api';
+const API = 'https://worker-review-backend.onrender.com/api';
 let storeToken = localStorage.getItem('storeToken');
 let currentPage = 1;
 let pieChartInstance = null;

@@ -2,7 +2,7 @@
 // admin.js - Admin dashboard logic
 // ============================================================
 
-const API = 'http://localhost:5001/api';
+const API = 'https://worker-review-backend.onrender.com/api';
 let adminToken = localStorage.getItem('adminToken');
 let adminReviewPage = 1;
 let pieChartInst = null;
