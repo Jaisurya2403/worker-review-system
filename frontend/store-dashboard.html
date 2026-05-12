@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Store Dashboard - WorkerReview</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <div class="logo-icon">🫱🏻‍🫲🏼</div>
+    <span id="store-name-nav">My Store</span>
+  </div>
+  <div class="navbar-actions">
+    <span class="navbar-user" id="username-display"></span>
+    <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <ul class="sidebar-nav">
+      <li><a href="#" class="active" onclick="showTab('overview', this)"><span class="nav-icon">📊</span> Overview</a></li>
+      <li><a href="#" onclick="showTab('workers', this)"><span class="nav-icon">👥</span> Workers</a></li>
+      <li><a href="#" onclick="showTab('reviews', this)"><span class="nav-icon">💬</span> Reviews</a></li>
+      <li><a href="#" onclick="showTab('qr', this)"><span class="nav-icon">📱</span> QR Code</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Alert area -->
+    <div id="alert-area"></div>
+
+    <!-- ============================================================
+         OVERVIEW TAB
+    ============================================================ -->
+    <div id="tab-overview">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Dashboard Overview</h1>
+          <p class="page-subtitle">Review performance for your store</p>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid" id="stats-cards">
+        <div class="stat-card">
+          <div class="stat-icon">💬</div>
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-label">Total Reviews</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-icon">😊</div>
+          <div class="stat-value" id="stat-good">—</div>
+          <div class="stat-label">Good Reviews</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-icon">😕</div>
+          <div class="stat-value" id="stat-bad">—</div>
+          <div class="stat-label">Bad Reviews</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-value" id="stat-avg">—</div>
+          <div class="stat-label">Avg Rating</div>
+        </div>
+      </div>
+
+      <!-- Best / Needs Improvement -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;" id="performance-cards">
+        <div class="card">
+          <div class="card-title">🏆 Best Performer</div>
+          <div id="best-worker-content"><p style="color:var(--gray-500); font-size:0.9rem;">No data yet.</p></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📈 Needs Improvement</div>
+          <div id="improve-worker-content"><p style="color:var(--gray-500); font-size:0.9rem;">No data yet.</p></div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-grid">
+        <div class="card">
+          <div class="card-title">Reviews Breakdown</div>
+          <div class="chart-wrapper">
+            <canvas id="pieChart"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Monthly Trend</div>
+          <div class="chart-wrapper">
+            <canvas id="lineChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         WORKERS TAB
+    ============================================================ -->
+    <div id="tab-workers" class="hidden">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Team Members</h1>
+          <p class="page-subtitle">Manage your workers</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddWorkerModal()">+ Add Worker</button>
+      </div>
+
+      <div class="card">
+        <div id="workers-list">
+          <div class="loading-state">
+            <div class="spinner spinner-dark"></div>
+            <p>Loading workers...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         REVIEWS TAB
+    ============================================================ -->
+    <div id="tab-reviews" class="hidden">
+      <div class="page-header">
+        <h1 class="page-title">Customer Reviews</h1>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <select id="filter-worker" onchange="loadReviews()">
+          <option value="">All Workers</option>
+        </select>
+        <select id="filter-type" onchange="loadReviews()">
+          <option value="">All Types</option>
+          <option value="good">😊 Good</option>
+          <option value="bad">😕 Bad</option>
+        </select>
+        <select id="filter-rating" onchange="loadReviews()">
+          <option value="">All Ratings</option>
+          <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+          <option value="4">⭐⭐⭐⭐ 4 Stars</option>
+          <option value="3">⭐⭐⭐ 3 Stars</option>
+          <option value="2">⭐⭐ 2 Stars</option>
+          <option value="1">⭐ 1 Star</option>
+        </select>
+        <input type="date" id="filter-from" onchange="loadReviews()" title="From date" />
+        <input type="date" id="filter-to" onchange="loadReviews()" title="To date" />
+        <button class="btn btn-outline btn-sm" onclick="clearFilters()">Clear</button>
+      </div>
+
+      <div class="card">
+        <div id="reviews-list">
+          <div class="loading-state">
+            <div class="spinner spinner-dark"></div>
+            <p>Loading reviews...</p>
+          </div>
+        </div>
+        <div id="reviews-pagination" style="text-align:center; padding-top:16px;"></div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         QR CODE TAB
+    ============================================================ -->
+    <div id="tab-qr" class="hidden">
+      <div class="page-header">
+        <h1 class="page-title">Your QR Code</h1>
+      </div>
+      <div class="card" style="max-width:420px;">
+        <p style="color:var(--gray-500); font-size:0.9rem; margin-bottom:20px;">
+          Print this QR code and place it at your store. Customers scan it to leave reviews.
+        </p>
+        <div id="qr-display" class="qr-container">
+          <div class="loading-state"><div class="spinner spinner-dark"></div></div>
+        </div>
+        <div style="margin-top:16px;" id="qr-url-display"></div>
+        <button class="btn btn-primary mt-2" onclick="printQR()">🖨️ Print QR Code</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     Add/Edit Worker Modal
+============================================================ -->
+<div id="worker-modal" class="modal-overlay hidden" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modal-title-text">Add Worker</span>
+      <button class="modal-close" onclick="closeWorkerModal()">✕</button>
+    </div>
+
+    <div id="modal-alert"></div>
+
+    <form id="worker-form" onsubmit="saveWorker(event)">
+      <input type="hidden" id="edit-worker-id" />
+
+      <div class="form-group">
+        <label class="form-label">Profile Photo</label>
+        <label class="upload-label">
+          <div class="upload-placeholder" id="upload-placeholder">
+            <span class="up-icon">📷</span>
+            <span>Upload Photo</span>
+          </div>
+          <img id="image-preview-img" class="image-preview" style="display:none;" src="" alt="Preview" />
+          <div style="margin-left:14px;">
+            <p style="font-size:0.85rem; font-weight:600;">Choose photo</p>
+            <p style="font-size:0.78rem; color:var(--gray-500);">JPG, PNG up to 5MB</p>
+          </div>
+          <input type="file" id="worker-image" accept="image/*" style="display:none;" onchange="previewImage(event)" />
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="worker-name">Worker Name *</label>
+        <input type="text" id="worker-name" class="form-control" placeholder="Full name" required maxlength="200" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="worker-role">Role / Position</label>
+        <input type="text" id="worker-role" class="form-control" placeholder="e.g. Cashier, Manager, Chef" maxlength="200" />
+      </div>
+
+      <div class="form-group" id="status-group" style="display:none;">
+        <label class="form-label" for="worker-status">Status</label>
+        <select id="worker-status" class="form-control">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:8px;">
+        <button type="button" class="btn btn-outline" onclick="closeWorkerModal()" style="flex:1;">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="save-worker-btn" style="flex:1;">Save Worker</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="js/store.js"></script>
+</body>
+</html>

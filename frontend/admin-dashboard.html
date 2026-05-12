@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - WorkerReview</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <div class="logo-icon">🔧</div>
+    <span>Admin Panel</span>
+  </div>
+  <div class="navbar-actions">
+    <span class="navbar-user" id="admin-username"></span>
+    <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <ul class="sidebar-nav">
+      <li><a href="#" class="active" onclick="showTab('overview', this)"><span class="nav-icon">📊</span> Overview</a></li>
+      <li><a href="#" onclick="showTab('stores', this)"><span class="nav-icon">🏪</span> Stores</a></li>
+      <li><a href="#" onclick="showTab('reviews', this)"><span class="nav-icon">💬</span> All Reviews</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div id="alert-area"></div>
+
+    <!-- ============================================================
+         OVERVIEW TAB
+    ============================================================ -->
+    <div id="tab-overview">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Platform Overview</h1>
+          <p class="page-subtitle">All stores and reviews at a glance</p>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">🏪</div>
+          <div class="stat-value" id="stat-stores">—</div>
+          <div class="stat-label">Total Stores</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" id="stat-active">—</div>
+          <div class="stat-label">Active Stores</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-icon">🔴</div>
+          <div class="stat-value" id="stat-disabled">—</div>
+          <div class="stat-label">Disabled Stores</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-icon">💬</div>
+          <div class="stat-value" id="stat-reviews">—</div>
+          <div class="stat-label">Total Reviews</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">😊</div>
+          <div class="stat-value" id="stat-good">—</div>
+          <div class="stat-label">Good Reviews</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-icon">😕</div>
+          <div class="stat-value" id="stat-bad">—</div>
+          <div class="stat-label">Bad Reviews</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" id="stat-workers">—</div>
+          <div class="stat-label">Active Workers</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="card">
+          <div class="card-title">Review Distribution</div>
+          <div class="chart-wrapper"><canvas id="adminPieChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Stores Status</div>
+          <div class="chart-wrapper"><canvas id="adminBarChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         STORES TAB
+    ============================================================ -->
+    <div id="tab-stores" class="hidden">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Manage Stores</h1>
+          <p class="page-subtitle">Create stores and manage access</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddStoreModal()">+ Add Store</button>
+      </div>
+
+      <div class="card">
+        <div id="stores-list">
+          <div class="loading-state">
+            <div class="spinner spinner-dark"></div>
+            <p>Loading stores...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         REVIEWS TAB (Admin moderation)
+    ============================================================ -->
+    <div id="tab-reviews" class="hidden">
+      <div class="page-header">
+        <h1 class="page-title">Review Moderation</h1>
+      </div>
+
+      <div class="filter-bar">
+        <select id="admin-filter-store" onchange="loadAdminReviews()">
+          <option value="">All Stores</option>
+        </select>
+        <select id="admin-filter-type" onchange="loadAdminReviews()">
+          <option value="">All Types</option>
+          <option value="good">😊 Good</option>
+          <option value="bad">😕 Bad</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="clearAdminFilters()">Clear</button>
+      </div>
+
+      <div class="card">
+        <div id="admin-reviews-list">
+          <div class="loading-state">
+            <div class="spinner spinner-dark"></div>
+            <p>Loading reviews...</p>
+          </div>
+        </div>
+        <div id="admin-reviews-pagination" style="text-align:center; padding-top:16px;"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     Add Store Modal
+============================================================ -->
+<div id="add-store-modal" class="modal-overlay hidden" onclick="closeModalOutside(event, 'add-store-modal')">
+  <div class="modal">
+    <div class="modal-title">
+      <span>Add New Store</span>
+      <button class="modal-close" onclick="closeModal('add-store-modal')">✕</button>
+    </div>
+
+    <div id="store-modal-alert"></div>
+
+    <form onsubmit="createStore(event)">
+      <p style="font-size:0.85rem; color:var(--gray-500); margin-bottom:16px; background:var(--gray-100); padding:10px 12px; border-radius:var(--radius);">
+        ℹ️ Creating a store will also generate a QR code and owner login credentials.
+      </p>
+
+      <div style="font-weight:700; font-size:0.85rem; color:var(--primary); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.05em;">Store Details</div>
+      <div class="form-group">
+        <label class="form-label">Store Name *</label>
+        <input type="text" id="new-store-name" class="form-control" placeholder="e.g. Coffee Palace" required maxlength="200" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Store Address</label>
+        <input type="text" id="new-store-address" class="form-control" placeholder="123 Main Street, City" maxlength="500" />
+      </div>
+
+      <div style="font-weight:700; font-size:0.85rem; color:var(--primary); margin-bottom:12px; margin-top:8px; text-transform:uppercase; letter-spacing:0.05em;">Owner Login</div>
+      <div class="form-group">
+        <label class="form-label">Owner Username *</label>
+        <input type="text" id="new-owner-username" class="form-control" placeholder="e.g. coffeepalace_owner" required maxlength="100" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Owner Password *</label>
+        <input type="password" id="new-owner-password" class="form-control" placeholder="Min 6 characters" required minlength="6" maxlength="100" />
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:8px;">
+        <button type="button" class="btn btn-outline" onclick="closeModal('add-store-modal')" style="flex:1;">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="create-store-btn" style="flex:1;">Create Store</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     Store Created Success Modal
+============================================================ -->
+<div id="store-success-modal" class="modal-overlay hidden">
+  <div class="modal" style="text-align:center;">
+    <div style="font-size:2.5rem; margin-bottom:12px;">🎉</div>
+    <h2 style="font-size:1.2rem; font-weight:800; margin-bottom:8px;">Store Created!</h2>
+    <p style="color:var(--gray-500); font-size:0.9rem; margin-bottom:20px;">Save these credentials. The owner will use them to login.</p>
+
+    <div style="background:var(--gray-100); border-radius:var(--radius); padding:16px; text-align:left; margin-bottom:16px;">
+      <div style="font-size:0.82rem; color:var(--gray-500); margin-bottom:4px;">Store Name</div>
+      <div id="created-store-name" style="font-weight:700;"></div>
+      <div style="margin-top:10px; font-size:0.82rem; color:var(--gray-500);">Owner Username</div>
+      <div id="created-owner-username" style="font-weight:700; font-family:monospace;"></div>
+      <div style="margin-top:10px; font-size:0.82rem; color:var(--gray-500);">Review URL</div>
+      <div id="created-qr-url" style="font-size:0.8rem; word-break:break-all; color:var(--primary);"></div>
+    </div>
+
+    <div style="background:var(--warning-light); border-radius:var(--radius); padding:10px 14px; font-size:0.82rem; color:#92400E; margin-bottom:20px; text-align:left;">
+      ⚠️ <strong>Important:</strong> Save the QR code image from the QR Code section on the stores list. Print it and place it at the store.
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="closeModal('store-success-modal'); loadStores();">Got it!</button>
+  </div>
+</div>
+
+<!-- View QR Modal -->
+<div id="qr-modal" class="modal-overlay hidden" onclick="closeModalOutside(event, 'qr-modal')">
+  <div class="modal" style="text-align:center; max-width:340px;">
+    <div class="modal-title">
+      <span>Store QR Code</span>
+      <button class="modal-close" onclick="closeModal('qr-modal')">✕</button>
+    </div>
+    <div id="qr-modal-content"></div>
+    <button class="btn btn-primary mt-2 btn-full" onclick="printQRFromModal()">🖨️ Print QR Code</button>
+  </div>
+</div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

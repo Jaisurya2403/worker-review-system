@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leave a Review</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- Loading screen -->
+<div id="loading-screen" class="review-page" style="display:flex; align-items:center; justify-content:center;">
+  <div style="text-align:center;">
+    <div class="spinner spinner-dark" style="width:40px;height:40px;margin:0 auto 14px;"></div>
+    <p style="color:var(--gray-500);">Loading store info...</p>
+  </div>
+</div>
+
+<!-- Error screen (store not found, disabled, etc.) -->
+<div id="error-screen" class="review-page hidden" style="align-items:center; justify-content:center;">
+  <div class="auth-card" style="text-align:center;">
+    <div style="font-size:3rem; margin-bottom:12px;">❌</div>
+    <h2 id="error-title">Something went wrong</h2>
+    <p id="error-msg" style="color:var(--gray-500); margin-top:8px; font-size:0.9rem;"></p>
+  </div>
+</div>
+
+<!-- Main Review Page -->
+<div id="main-page" class="review-page hidden">
+  <div style="max-width: 520px; margin: 0 auto;">
+
+    <!-- Header -->
+    <div class="review-header">
+      <div class="store-badge">📍 <span id="store-name-badge">Store</span></div>
+      <h1 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 4px;">How was your experience?</h1>
+      <p style="color: var(--gray-500); font-size: 0.9rem;">Your feedback helps improve our service.</p>
+    </div>
+
+    <div id="alert-area"></div>
+
+    <!-- Step 1: Select Worker -->
+    <div class="review-step" id="step-worker">
+      <div class="step-header">
+        <div class="step-number">1</div>
+        <div class="step-title">Select the team member who served you</div>
+      </div>
+      <div id="workers-loading" style="text-align:center; padding:20px; color:var(--gray-500);">
+        <div class="spinner spinner-dark" style="width:24px;height:24px;margin:0 auto 8px;"></div>
+        Loading team members...
+      </div>
+      <div id="worker-cards" class="worker-cards" style="display:none;"></div>
+      <div id="no-workers" class="empty-state hidden">
+        <div class="empty-icon">👤</div>
+        <p>No team members available at this time.</p>
+      </div>
+    </div>
+
+    <!-- Step 2: Rating & Review Type -->
+    <div class="review-step" id="step-rating">
+      <div class="step-header">
+        <div class="step-number">2</div>
+        <div class="step-title">Rate your experience</div>
+      </div>
+
+      <!-- Good / Bad buttons -->
+      <div class="review-type-buttons mb-2">
+        <button class="review-type-btn good" id="btn-good" onclick="selectReviewType('good')">
+          <span class="type-emoji">😊</span>
+          <span>Good</span>
+        </button>
+        <button class="review-type-btn bad" id="btn-bad" onclick="selectReviewType('bad')">
+          <span class="type-emoji">😕</span>
+          <span>Bad</span>
+        </button>
+      </div>
+
+      <!-- Star rating -->
+      <div style="text-align:center; margin-top: 16px;">
+        <p style="font-size:0.85rem; color:var(--gray-500); margin-bottom:10px;">Optional: Give a star rating</p>
+        <div class="star-rating" id="star-rating">
+          <span class="star" data-value="1" onclick="selectRating(1)">★</span>
+          <span class="star" data-value="2" onclick="selectRating(2)">★</span>
+          <span class="star" data-value="3" onclick="selectRating(3)">★</span>
+          <span class="star" data-value="4" onclick="selectRating(4)">★</span>
+          <span class="star" data-value="5" onclick="selectRating(5)">★</span>
+        </div>
+        <p id="rating-text" style="font-size:0.82rem; color:var(--gray-500); margin-top:6px; height:18px;"></p>
+      </div>
+    </div>
+
+    <!-- Step 3: Description -->
+    <div class="review-step" id="step-description">
+      <div class="step-header">
+        <div class="step-number">3</div>
+        <div class="step-title">Add a comment (optional)</div>
+      </div>
+      <textarea
+        id="review-description"
+        class="form-control"
+        placeholder="Share your experience... (any language supported)"
+        rows="4"
+        maxlength="1000"
+      ></textarea>
+      <p style="font-size:0.78rem; color:var(--gray-500); margin-top:4px; text-align:right;">
+        <span id="char-count">0</span>/1000
+      </p>
+    </div>
+
+    <!-- Submit Button -->
+    <button id="submit-btn" class="btn btn-primary btn-lg btn-full" onclick="submitReview()">
+      Submit Review
+    </button>
+
+    <p style="text-align:center; margin-top:14px; font-size:0.78rem; color:var(--gray-400);">
+      🔒 Your review is completely anonymous
+    </p>
+
+    <div style="height:24px;"></div>
+  </div>
+</div>
+
+<!-- Success Page -->
+<div id="success-page" class="success-page hidden">
+  <div class="success-card">
+    <div class="success-icon">🎉</div>
+    <h2 style="font-size:1.5rem; font-weight:800; margin-bottom:8px;">Thank You!</h2>
+    <p style="color:var(--gray-500); margin-bottom:24px;">Your feedback has been submitted successfully. It helps us serve you better!</p>
+    <button class="btn btn-success btn-full" onclick="location.reload()">Leave Another Review</button>
+  </div>
+</div>
+
+<script src="js/customer.js"></script>
+</body>
+</html>
