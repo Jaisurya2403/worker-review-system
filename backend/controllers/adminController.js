@@ -26,7 +26,7 @@ async function login(req, res) {
     const admin = rows[0];
 
 // TEMPORARY SIMPLE LOGIN
-if (password !== '123456') {
+if (password !== '#jai242006') {
   return res.status(401).json({ error: 'Invalid username or password.' });
 }
 
