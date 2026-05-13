@@ -481,24 +481,40 @@ function clearFilters() {
 // ============================================================
 async function loadQRCode() {
   try {
-    const res = await fetch(`${API}/store/dashboard`, { headers: authHeaders() });
+    const res = await fetch(`${API}/store/dashboard`, {
+      headers: authHeaders()
+    });
+
     if (!res.ok) return;
+
     const data = await res.json();
     const store = data.store;
-    const baseUrl = API.replace('/api', '');
+
     const reviewUrl = `${window.location.origin}/customer-review.html?store=${store.qr_slug}`;
 
-    const qrDisplay = document.getElementById('qr-display');
-    qrDisplay.innerHTML = store.qr_code_path
-      ? `<img src="${baseUrl}/${store.qr_code_path}" alt="QR Code" style="width:200px;height:200px;" />`
-      : `<p style="color:var(--gray-500);">QR code not generated yet.</p>`;
+    const qrImageUrl =
+      `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(reviewUrl)}`;
+
+    document.getElementById('qr-display').innerHTML = `
+      <img
+        src="${qrImageUrl}"
+        alt="QR Code"
+        style="width:200px;height:200px;border-radius:12px;"
+      />
+    `;
 
     document.getElementById('qr-url-display').innerHTML = `
-      <p style="font-size:0.82rem; color:var(--gray-500); word-break:break-all;">Review URL:<br/>
-      <a href="${reviewUrl}" target="_blank" style="color:var(--primary);">${reviewUrl}</a></p>`;
+      <p style="font-size:0.82rem; color:var(--gray-500); word-break:break-all;">
+        Review URL:<br/>
+        <a href="${reviewUrl}" target="_blank" style="color:var(--primary);">
+          ${reviewUrl}
+        </a>
+      </p>
+    `;
 
   } catch (e) {
-    document.getElementById('qr-display').innerHTML = `<p style="color:var(--danger);">Failed to load QR code.</p>`;
+    document.getElementById('qr-display').innerHTML =
+      `<p style="color:var(--danger);">Failed to load QR code.</p>`;
   }
 }
 

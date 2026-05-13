@@ -320,28 +320,24 @@ async function deleteStore(id, storeName) {
 }
 
 function viewQR(qrSlug, storeName, qrCodePath) {
-  const baseUrl = `https://worker-review-backend.onrender.com`;
   const reviewUrl = `${window.location.origin}/customer-review.html?store=${qrSlug}`;
-  currentQRData = { storeName, reviewUrl, qrCodePath };
+  currentQRData = { storeName, reviewUrl };
+
+  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(reviewUrl)}`;
 
   const qrContent = document.getElementById('qr-modal-content');
 
-  if (qrCodePath) {
-    qrContent.innerHTML = `
-      <p style="font-weight:700; margin-bottom:12px;">${escapeHtml(storeName)}</p>
-      <img src="${baseUrl}/${qrCodePath}" style="width:200px;height:200px; border:6px solid white; box-shadow:var(--shadow); border-radius:var(--radius);" alt="QR Code" onerror="this.style.display='none'; document.getElementById('qr-fallback').style.display='block';" />
-      <div id="qr-fallback" style="display:none; background:var(--gray-100); padding:20px; border-radius:var(--radius); margin-top:8px;">
-        <p style="font-size:0.82rem; color:var(--gray-500);">QR image not found on server.</p>
-      </div>
-      <p style="margin-top:12px; font-size:0.78rem; word-break:break-all;">
-        <a href="${reviewUrl}" target="_blank" style="color:var(--primary);">${reviewUrl}</a>
-      </p>`;
-  } else {
-    qrContent.innerHTML = `
-      <p style="color:var(--gray-500); font-size:0.9rem; margin:20px 0;">QR code not generated for this store.</p>
-      <p style="font-size:0.82rem; word-break:break-all;">Review URL:<br/>
-      <a href="${reviewUrl}" target="_blank" style="color:var(--primary);">${reviewUrl}</a></p>`;
-  }
+  qrContent.innerHTML = `
+    <p style="font-weight:700; margin-bottom:12px;">${escapeHtml(storeName)}</p>
+
+    <img src="${qrImageUrl}"
+      style="width:220px;height:220px; border:6px solid white; box-shadow:var(--shadow); border-radius:var(--radius);"
+      alt="QR Code" />
+
+    <p style="margin-top:12px; font-size:0.78rem; word-break:break-all;">
+      <a href="${reviewUrl}" target="_blank" style="color:var(--primary);">${reviewUrl}</a>
+    </p>
+  `;
 
   document.getElementById('qr-modal').classList.remove('hidden');
 }
