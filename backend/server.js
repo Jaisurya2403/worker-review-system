@@ -1,15 +1,6 @@
 // ============================================================
 // server.js - Main entry point for the backend server
-const db = require('./config/db');
 
-app.get('/api/test-admins', async (req, res) => {
-  try {
-    const [rows] = await db.query('SELECT username FROM admins');
-    res.json(rows);
-  } catch (err) {
-    res.json({ error: err.message });
-  }
-});
 // ============================================================
 
 require('dotenv').config();
@@ -108,3 +99,14 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
+const db = require('./config/db');
+
+app.get('/api/test-admins', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT username FROM admins');
+    res.json(rows);
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
