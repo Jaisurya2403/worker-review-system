@@ -25,7 +25,9 @@ async function login(req, res) {
 
     const admin = rows[0];
 
-if (username !== 'admin' || password !== '#jai242006') {
+    const isMatch = await bcrypt.compare(password, admin.password_hash);
+
+if (!isMatch) {
   return res.status(401).json({ error: 'Invalid username or password.' });
 }
 
