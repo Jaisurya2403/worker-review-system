@@ -1,27 +1,29 @@
-const bcrypt = require('bcryptjs');
-const db = require('./config/db');
+const bcrypt = require("bcryptjs");
+const db = require("./config/db");
 
-async function createAdmin() {
-  const username = process.argv[2];
-  const password = process.argv[3];
+async function run() {
 
-  if (!username || !password) {
-    console.log('Usage: node createAdmin.js username password');
-    process.exit();
-  }
-
-  const hash = await bcrypt.hash(password, 10);
+  const adminHash = await bcrypt.hash("Admin@123", 10);
+  const jaiHash = await bcrypt.hash("Jai@123", 10);
 
   await db.query(
-    'INSERT INTO admins (username, password_hash) VALUES (?, ?)',
-    [username, hash]
+    "INSERT INTO admins (username, password_hash) VALUES (?, ?)",
+    ["admins", adminHash]
   );
 
-  console.log('Admin created successfully');
+  await db.query(
+    "INSERT INTO admins (username, password_hash) VALUES (?, ?)",
+    ["jais", jaiHash]
+  );
+
+  console.log("Admins created");
+  console.log("admins / Admin@123");
+  console.log("jais / Jai@123");
+
   process.exit();
 }
 
-createAdmin().catch(err => {
+run().catch(err => {
   console.error(err);
   process.exit(1);
 });
